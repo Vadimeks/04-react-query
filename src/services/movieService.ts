@@ -1,7 +1,5 @@
-// src/services/movieService.ts
-
 import axios from "axios";
-import type { Movie } from "../types/movie";
+import type { MovieApiResponse } from "../types/movie";
 
 const tmdbApi = axios.create({
   baseURL: "https://api.themoviedb.org/3",
@@ -10,24 +8,20 @@ const tmdbApi = axios.create({
   },
 });
 
-interface TmdbApiResponse {
-  page: number;
-  results: Movie[];
-  total_pages: number;
-  total_results: number;
-}
-
-export async function fetchMovies(query: string): Promise<Movie[]> {
+export async function fetchMovies(
+  query: string,
+  page: number = 1
+): Promise<MovieApiResponse> {
   try {
-    const response = await tmdbApi.get<TmdbApiResponse>("/search/movie", {
+    const response = await tmdbApi.get<MovieApiResponse>("/search/movie", {
       params: {
-        query: query,
+        query,
         include_adult: false,
         language: "en-US",
-        page: 1,
+        page,
       },
     });
-    return response.data.results;
+    return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("Axios error fetching movies:", error.message);
