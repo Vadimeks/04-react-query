@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { MovieApiResponse } from "../types/movie";
+import type { Movie } from "../types/movie";
 
 const tmdbApi = axios.create({
   baseURL: "https://api.themoviedb.org/3",
@@ -7,6 +7,11 @@ const tmdbApi = axios.create({
     Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`,
   },
 });
+
+export interface MovieApiResponse {
+  results: Movie[];
+  total_pages: number;
+}
 
 export async function fetchMovies(
   query: string,
