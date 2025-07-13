@@ -51,11 +51,6 @@ export default function App() {
             Showing results for: "{query}"
           </p>
         )}
-      {isLoading && <Loader />}
-      {error && <ErrorMessage />}
-      {!isLoading && !error && data && data.results.length > 0 && (
-        <MovieGrid movies={data.results} onSelect={handleMovieSelect} />
-      )}
       {data && data.total_pages > 1 && (
         <ReactPaginate
           pageCount={data.total_pages}
@@ -68,6 +63,11 @@ export default function App() {
           nextLabel="→"
           previousLabel="←"
         />
+      )}
+      {isLoading && <Loader />}
+      {error && <ErrorMessage />}
+      {!isLoading && !error && data && data.results.length > 0 && (
+        <MovieGrid movies={data.results} onSelect={handleMovieSelect} />
       )}
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={handleCloseModal} />
