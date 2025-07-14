@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Toaster, toast } from "react-hot-toast";
 import ReactPaginate from "react-paginate";
+import { keepPreviousData } from "@tanstack/react-query";
 import css from "./App.module.css";
 import SearchBar from "../SearchBar/SearchBar";
 import MovieGrid from "../MovieGrid/MovieGrid";
@@ -19,24 +20,28 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const { data, isLoading, error } = useQuery<MovieApiResponse, Error>({
+  const { data, isLoading, isError, isSuccess } = useQuery<
+    MovieApiResponse,
+    Error
+  >({
     queryKey: ["movies", query, page],
     queryFn: () => fetchMovies(query, page),
     enabled: !!query,
+    placeholderData: keepPreviousData,
   });
 
   useEffect(() => {
-    if (!isLoading && !error && query && data && data.results.length === 0) {
+    if (isSuccess && query && data && data.results.length === 0) {
       toast.error(`No movies found for "${query}". Try another search.`, {
         id: "no-movies-found",
       });
     }
-    if (error) {
+    if (isError) {
       toast.error("Failed to fetch movies. Please try again.", {
         id: "fetch-error",
       });
     }
-  }, [data, isLoading, error, query]);
+  }, [data, isLoading, isError, isSuccess, query]);
 
   const handleSearchSubmit = (searchQuery: string) => {
     setQuery(searchQuery);
@@ -75,8 +80,8 @@ export default function App() {
         />
       )}
       {isLoading && <Loader />}
-      {error && <ErrorMessage />}
-      {!isLoading && !error && data && data.results.length > 0 && (
+      {isError && <ErrorMessage />}
+      {isSuccess && data && data.results.length > 0 && (
         <MovieGrid movies={data.results} onSelect={handleMovieSelect} />
       )}
       {selectedMovie && (
